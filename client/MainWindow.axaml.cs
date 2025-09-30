@@ -3,6 +3,7 @@ using Avalonia.Media;
 using Avalonia.Layout;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bingo;
 
@@ -92,6 +93,14 @@ public partial class MainWindow : Window
                 ".....",
                 ".....",
                 "XXXXX"
+            }),
+            new BingoPattern("Pattern", new string[]
+            {
+                "X...X",
+                ".X.X.",
+                "..X..",
+                "..X..",
+                "..X.."
             })
         };
     }
@@ -116,6 +125,74 @@ public partial class MainWindow : Window
                     }
             }
             : btn.Background = new SolidColorBrush(Colors.Gray);
+
+
+            List<BingoPattern> completed_patterns = new List<BingoPattern>();
+
+            foreach (BingoPattern pattern in patterns)
+            {
+                if (pattern.IsComplete(clicked))
+                {
+                    for (int y = 0; y < pattern.Layout.Length; y++)
+                    {
+                        for (int x = 0; x < pattern.Layout[y].Length; x++)
+                        {
+                            if (pattern.Layout[y][x] == 'X')
+                            {
+                                completed_patterns.Add(pattern);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for (int y = 0; y < pattern.Layout.Length; y++)
+                    {
+                        for (int x = 0; x < pattern.Layout[y].Length; x++)
+                        {
+                            if (pattern.Layout[y][x] == 'X')
+                            {
+                                cells[y, x].Background = clicked[y, x]
+                                ? new LinearGradientBrush
+                                {
+                                    StartPoint = new Avalonia.RelativePoint(0.5, 0, Avalonia.RelativeUnit.Relative),
+                                    EndPoint = new Avalonia.RelativePoint(0.5, 1, Avalonia.RelativeUnit.Relative),
+                                    GradientStops =
+                                        {
+                                            new GradientStop(Colors.Orange, 0),
+                                            new GradientStop(Colors.Magenta, 1)
+                                        }
+                                }
+                                : cells[y, x].Background = new SolidColorBrush(Colors.Gray);
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach (BingoPattern completed_pattern in completed_patterns)
+            {
+                for (int y = 0; y < completed_pattern.Layout.Length; y++)
+                {
+                    for (int x = 0; x < completed_pattern.Layout[y].Length; x++)
+                    {
+                        if (completed_pattern.Layout[y][x] == 'X')
+                        {
+                            cells[y, x].Background = new LinearGradientBrush
+                            {
+                                StartPoint = new Avalonia.RelativePoint(0.5, 0, Avalonia.RelativeUnit.Relative),
+                                EndPoint = new Avalonia.RelativePoint(0.5, 1, Avalonia.RelativeUnit.Relative),
+                                GradientStops =
+                                    {
+                                        new GradientStop(Colors.Yellow, 0),
+                                        new GradientStop(Colors.Orange, 1)
+                                    }
+                            };
+                        }
+                    }
+                }
+            }
 
             CheckCurrentPattern();
         }
