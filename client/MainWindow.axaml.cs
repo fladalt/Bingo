@@ -13,6 +13,8 @@ public partial class MainWindow : Window
     private bool[,] clicked = new bool[5, 5];
 
     private List<BingoPattern> patterns;
+    private List<BingoPattern> priority_patterns;
+    BingoPattern selected_priority_pattern;
 
     public MainWindow()
     {
@@ -93,16 +95,73 @@ public partial class MainWindow : Window
                 ".....",
                 ".....",
                 "XXXXX"
+            })
+        };
+
+
+        priority_patterns = new List<BingoPattern>
+        {
+            new BingoPattern("Smile", new string[]
+            {
+                ".X.X.",
+                ".....",
+                "X...X",
+                ".XXX.",
+                "....."
             }),
-            new BingoPattern("Pattern", new string[]
+            new BingoPattern("Smile", new string[]
             {
                 "X...X",
                 ".X.X.",
                 "..X..",
                 "..X..",
                 "..X.."
+            }),
+            new BingoPattern("Smile", new string[]
+            {
+                "..X..",
+                "..X..",
+                "XXXXX",
+                "..X..",
+                "..X.."
+            }),
+            new BingoPattern("Smile", new string[]
+            {
+                "X.X.X",
+                "..X.",
+                ".X.X.",
+                "..X..",
+                "X.X.X"
+            }),
+            new BingoPattern("Smile", new string[]
+            {
+                "X...X",
+                ".X.X.",
+                "..X..",
+                ".X.X.",
+                "X...X"
+            }),
+            new BingoPattern("Smile", new string[]
+            {
+                "..X..",
+                ".X.X.",
+                "X...X",
+                ".X.X.",
+                "..X.."
+            }),
+            new BingoPattern("Smile", new string[]
+            {
+                "XXXXX",
+                "X...X",
+                "X...X",
+                "X...X",
+                "XXXXX"
             })
+            
         };
+
+        //TODO FIX SO THAT THIS PATTERN IS SELECTED BY SEEED
+        selected_priority_pattern = priority_patterns[new Random().Next(priority_patterns.Count)]; 
     }
 
     private void OnCellClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -153,16 +212,7 @@ public partial class MainWindow : Window
                             if (pattern.Layout[y][x] == 'X')
                             {
                                 cells[y, x].Background = clicked[y, x]
-                                ? new LinearGradientBrush
-                                {
-                                    StartPoint = new Avalonia.RelativePoint(0.5, 0, Avalonia.RelativeUnit.Relative),
-                                    EndPoint = new Avalonia.RelativePoint(0.5, 1, Avalonia.RelativeUnit.Relative),
-                                    GradientStops =
-                                        {
-                                            new GradientStop(Colors.Orange, 0),
-                                            new GradientStop(Colors.Magenta, 1)
-                                        }
-                                }
+                                ? new SolidColorBrush(Colors.LightGray)
                                 : cells[y, x].Background = new SolidColorBrush(Colors.Gray);
 
                             }
@@ -191,6 +241,58 @@ public partial class MainWindow : Window
                             };
                         }
                     }
+                }
+            }
+
+            if (selected_priority_pattern.IsComplete(clicked))
+            {
+                for (int y = 0; y < selected_priority_pattern.Layout.Length; y++)
+                {
+                    for (int x = 0; x < selected_priority_pattern.Layout[y].Length; x++)
+                    {
+                        if (selected_priority_pattern.Layout[y][x] == 'X')
+                        {
+                            cells[y, x].Background = new LinearGradientBrush
+                            {
+                                StartPoint = new Avalonia.RelativePoint(0.5, 0, Avalonia.RelativeUnit.Relative),
+                                EndPoint = new Avalonia.RelativePoint(0.5, 1, Avalonia.RelativeUnit.Relative),
+                                GradientStops =
+                                    {
+                                        new GradientStop(Colors.Red, 0),
+                                        new GradientStop(Colors.Purple, 1)
+                                    }
+                            };
+                        }
+                    }
+                }
+            }
+
+
+            bool black_out = true;
+
+            foreach (bool click in clicked)
+            {
+                if (!click)
+                {
+                    black_out = false;
+                    break;
+                }
+            }
+
+            if (black_out)
+            {
+                foreach (Button button in cells)
+                {
+                    button.Background = new LinearGradientBrush
+                    {
+                        StartPoint = new Avalonia.RelativePoint(0.5, 0, Avalonia.RelativeUnit.Relative),
+                        EndPoint = new Avalonia.RelativePoint(0.5, 1, Avalonia.RelativeUnit.Relative),
+                        GradientStops =
+                            {
+                                new GradientStop(Colors.DarkBlue, 0),
+                                new GradientStop(Colors.Black, 1)
+                            }
+                    };
                 }
             }
 
