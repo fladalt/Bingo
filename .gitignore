@@ -1,3 +1,5 @@
 /.vscode
-/bin
-/obj
+client/bin
+client/obj
+master/bin
+master/obj
